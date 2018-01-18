@@ -39,6 +39,13 @@
 
 (square-root 10)
 
+(define (cubic n)
+  (* n n n)
+(define (cubic-root x)
+  (fixed-point-damp (lambda (y) (/ x (cubic y))) 1.0))
+;Attention: cannot converge. see ex1.45 for reason
+;(cubic-root 10)
+
 ;(define find-root-damp
 ;  (fixed-point-damp (lambda (x) (/ (log 1000) (log x))) 2))
 ;(define golden-ratio
