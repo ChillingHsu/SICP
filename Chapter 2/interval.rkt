@@ -84,7 +84,7 @@
 (define (percent interval)
     (/ (width interval) (center interval)))
 ;ex2.13
-;当两个区间都为正区间时，其成绩的百分数误差值为
+;当两个区间都为正区间时，其乘积的百分数误差值为
 ; (/ (- (upper-bound interval) (lower-bound interval))
 ;    (+ (upper-bound interval) (lower-bound interval)))
 
