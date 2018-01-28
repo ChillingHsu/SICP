@@ -61,3 +61,69 @@
 ;所以tree->list-2增长速度更慢。
 (tree->list-1 bst-2)
 (tree->list-2 bst-2)
+
+;ex2.64
+;由有序列表构造一个平衡树，需要选定位于列表中间的元素this-entry作为根结点，然后将原序列划分为两部分分别以同样的方法构造两个平衡树作为左右子树。
+;这里的子过程partial-tree用到了一个特殊的序对作为返回值，避免了手动划分输入序列，直接用参数n划分了整个过程，降低了所需步数。
+(define (list->tree elements)
+  (car (partial-tree elements (length elements))))
+(define (partial-tree elts n)
+  (if (= n 0)
+      (cons '() elts)
+      (let ((left-size (quotient (- n 1) 2)))
+        (let ((left-result (partial-tree elts left-size)))
+          (let ((left-tree (car left-result))
+                (non-left-elts (cdr left-result))
+                (right-size (- n (+ left-size 1))))
+            (let ((this-entry (car non-left-elts))
+                  (right-result (partial-tree (cdr non-left-elts)
+                                              right-size)))
+              (let ((right-tree (car right-result))
+                    (remaining-elts (cdr right-result)))
+                (cons (make-tree this-entry
+                                 left-tree
+                                 right-tree)
+                      remaining-elts))))))))
+(list->tree (list 1 3 5 7 9 11))
+;a)
+; 5
+; | \
+; 1  9
+;  \  |\
+;   3 7 11
+;b) 对于一个长度为n的列表，partial-tree会将每个元素作为根结点构造一次子树，每次的步数为O(1)，所以总的步数以O(n)的量级增长。
+;ex2.65
+;由于list->tree和tree->list以及有序表的合并和交集都有O(n)的实现，所以可以将BST转化为list再进行操作。
+(define tree->list tree->list-2)
+
+(define (intersection-set-as-ordered-list set1 set2)
+  (if (or (null? set1) (null? set2))
+      '()
+      (let ((x1 (car set1)) (x2 (car set2)))
+        (cond ((= x1 x2)
+               (cons x1
+                     (intersection-set-as-ordered-list (cdr set1) (cdr set2))))
+              ((< x1 x2) (intersection-set-as-ordered-list (cdr set1) set2))
+              ((> x1 x2) (intersection-set-as-ordered-list set1 (cdr set2)))))))
+
+(define (union-set-as-ordered-list set1 set2)
+  (cond ((null? set1) set2)
+        ((null? set2) set1)
+        (else
+          (let ((x1 (car set1))
+                (x2 (car set2)))
+            (cond ((= x1 x2) (cons x1 (union-set-as-ordered-list (cdr set1) (cdr set2))))
+                  ((< x1 x2) (cons x1 (union-set-as-ordered-list (cdr set1) set2)))
+                  ((> x1 x2) (cons x2 (union-set-as-ordered-list set1 (cdr set2)))))))))
+(define (intersection-set set1 set2)
+  (list->tree
+    (intersection-set-as-ordered-list
+      (tree->list set1)
+      (tree->list set2))))
+(define (union-set set1 set2)
+  (list->tree
+    (union-set-as-ordered-list
+      (tree->list set1)
+      (tree->list set2))))
+
+(union-set bst-1 bst-2)
