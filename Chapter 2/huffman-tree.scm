@@ -84,7 +84,7 @@
                 (error "no match symbol -- ENCODE-SYMBOL" sym))))))
 
 (encode '(A D A B B C A) sample-tree)
-; (make-leaf-set init-leaves)
+;ex2.69
 (define (generate-huffman-tree pairs)
   (successive-merge (make-leaf-set pairs)))
 (define (successive-merge leaves)
@@ -99,4 +99,24 @@
            (- count 1)))))
   (car (merge-leaf-list leaves (length leaves))))
 (generate-huffman-tree init-leaves)
-sample-tree
+
+;ex2.70
+(define alphabet
+  '((A 2) (BOOM 1) (NA 16) (SHA 3) (GET 2) (YIP 9) (JOB 2) (WAH 1)))
+(define lyrics-tree (generate-huffman-tree alphabet))
+(+
+  (length (encode '(Get a job) lyrics-tree))
+  (length (encode '(Sha na na na na na na na na) lyrics-tree))
+  (length (encode '(Get a job) lyrics-tree))
+  (length (encode '(Sha na na na na na na na na) lyrics-tree))
+  (length (encode '(Wah yip yip yip yip yip yip yip yip yip) lyrics-tree))
+  (length (encode '(Sha boom) lyrics-tree)))
+(* 3
+  (+
+    (length '(Get a job))
+    (length '(Sha na na na na na na na na))
+    (length '(Get a job))
+    (length '(Sha na na na na na na na na))
+    (length '(Wah yip yip yip yip yip yip yip yip yip))
+    (length '(Sha boom))))
+;使用Huffman编码需要84个二进制位，使用定长编码需要108个二进制位。
