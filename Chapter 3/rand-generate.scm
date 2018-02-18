@@ -1,0 +1,27 @@
+;ex3.6
+(define random-init 9712)
+(define (rand-upate x)
+  (let ((a 17)
+        (b 11)
+        (m 128))
+    (remainder (+ (* a x)
+                  b)
+               m)))
+(define rand
+  (let ((x random-init))
+    (lambda (m)
+      (cond ((eq? m 'generate)
+             (set! x (rand-upate x))
+             x)
+            ((eq? m 'reset)
+             (lambda (new-init)
+               (set! x (new-init)))
+               x)))))
+
+(rand 'generate)
+(rand 'generate)
+(rand 'generate)
+(rand 'generate)
+
+((rand 'reset) 111)
+(rand 'generate)

@@ -22,11 +22,10 @@
                 ((eq? m 'deposit) deposit)
                 (else (error "Unknown requests -- MAKE-ACCOUNT" m))))
         (lambda (dummy-amount)
-          (begin
-            (set! wrong-try (+ wrong-try 1))
-            (if (< wrong-try 7)
-                wrong-try
-                (call-the-cops))))))
+          (set! wrong-try (+ wrong-try 1))
+          (if (< wrong-try 7)
+              wrong-try
+              (call-the-cops)))))
   dispatch)
 (define acc (make-account 100 'a-sample-password))
 ((acc 'a-sample-password 'withdraw) 700)
