@@ -1,3 +1,4 @@
+;ex3.14
 (define (mystery x)
   (define (loop x y)
     (if (null? x)

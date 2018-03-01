@@ -1,0 +1,15 @@
+;ex3.18
+(define loop?
+  (let ((visited '()))
+    (lambda (elt)
+      (cond ((not (pair? elt)) #f)
+            ((memq elt visited) #t)
+            (else (set! visited (cons elt visited))
+                  (loop? (cdr elt)))))))
+(loop? (list 1 2 3 4))
+(define (make-cycle x)
+  (set-cdr! (last-pair x) x)
+  x)
+(define c (make-cycle (list 'a 'b 'c)))
+(loop? c)
+(loop? '(1 2 3 4))
