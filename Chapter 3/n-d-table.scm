@@ -1,0 +1,55 @@
+;ex3.25
+(define (make-table)
+  (let ((local-table (list '*table*)))
+    (define (lookup . keys)
+      (define (lookup-iter keys remain table)
+        (cond ((= remain 0) (error "LOOKUP called with null key -- LOOKUP-ITER" keys))
+              ((= remain 1)
+               (let ((record (assoc (car keys) (cdr table))))
+                 (if record
+                     (cdr record)
+                     false)))
+              (else
+               (let ((subtable (assoc (car keys) (cdr table))))
+                 (if subtable
+                     (lookup-iter (cdr keys) (- remain 1) subtable)
+                     false)))))
+      (lookup-iter keys (length keys) local-table))
+    (define (insert! value . keys)
+      (define (insert-iter! keys remain table)
+        (cond ((= remain 0) (error "INSERT! called with null key -- INSERT-ITER!" keys))
+              ((= remain 1)
+               (let ((record (assoc (car keys) (cdr table))))
+                 (if record
+                     (set-cdr! record value)
+                     (set-cdr! table
+                               (cons (cons (car keys) value)
+                                     (cdr table))))))
+              (else
+                 (let ((subtable (assoc (car keys) (cdr table))))
+                   (if subtable
+                       (insert-iter! (cdr keys) (- remain 1) subtable)
+                       (let ((subtable (list (car keys))))
+                         (set-cdr! table (cons subtable (cdr table)))
+                         (insert-iter! (cdr keys) (- remain 1) subtable))))))
+        'inserted)
+    (insert-iter! keys (length keys) local-table))
+    (define (dispatch m)
+      (cond ((eq? m 'lookup) lookup)
+            ((eq? m 'insert!) insert!)
+            (else (error "Unknown operation -- TABLE" m))))
+    dispatch))
+(define (lookup t . keys) (apply (t 'lookup) keys))
+(define (insert! t value . keys) (apply (t 'insert!) (cons value keys)))
+(define t (make-table))
+(insert! t 3 'a 'c)
+(insert! t 2 'a 'b 'c)
+(insert! t 7 'c 'a 'b 'd)
+(insert! t 8 'c 'a 'b 'e)
+
+
+(lookup t 'a 'b 'c)
+(lookup t 'c 'a 'b 'd)
+(lookup t 'c 'a 'b)
+(lookup t 'a 'c)
+(lookup t 'a 'z)
