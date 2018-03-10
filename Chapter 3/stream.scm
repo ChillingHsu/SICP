@@ -130,7 +130,11 @@ sum ;Value: 210
 (define (fibgen a b)
   (cons-stream a (fibgen b (+ a b))))
 (define fibs (fibgen 0 1))
-
+(define (display-stream stream lines)
+  (display-line (stream-car stream))
+  (if (= lines 0)
+      'done
+      (display-stream (stream-cdr stream) (- lines 1))))
 
 (define (sieve stream)
   (cons-stream
@@ -172,4 +176,24 @@ sum ;Value: 210
   (partial-sums s 0))
 (define s (partial-sums integers))
 (stream-ref s 4)
-(display-stream s)
+
+;ex3.56
+(define (scale-stream stream factor)
+  (stream-map (lambda (x) (* x factor)) stream))
+(define (merge s1 s2)
+  (cond ((stream-null? s1) s2)
+        ((stream-null? s2) s1)
+        (else
+          (let ((s1car (stream-car s1))
+                (s2car (stream-car s2)))
+            (cond ((< s1car s2car)
+                   (cons-stream s1car (merge (stream-cdr s1) s2)))
+                  ((< s2car s1car)
+                   (cons-stream s2car (merge (stream-cdr s2) s1)))
+                  (else
+                   (cons-stream s1car (merge (stream-cdr s1)
+                                             (stream-cdr s2)))))))))
+(define S (cons-stream 1 (merge (scale-stream S 2)
+                                (merge (scale-stream S 3)
+                                       (scale-stream S 5)))))
+(display-stream S 10)
