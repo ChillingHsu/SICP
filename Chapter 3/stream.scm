@@ -158,3 +158,18 @@ sum ;Value: 210
 ;ex3.53
 (define s (cons-stream 1 (add-streams s s)))
 ;stream 1 2 4 8 16 32 ...
+
+;ex3.54
+(define (mul-stream s1 s2)
+  (stream-map * s1 s2))
+(define s (cons-stream 1 (mul-stream s integers)))
+(stream-ref s 10)
+;ex3.55
+(define (partial-sums s)
+  (define (partial-sums s accum)
+    (cons-stream (+ (stream-car s) accum)
+                 (partial-sums (stream-cdr s) (+ (stream-car s) accum))))
+  (partial-sums s 0))
+(define s (partial-sums integers))
+(stream-ref s 4)
+(display-stream s)
