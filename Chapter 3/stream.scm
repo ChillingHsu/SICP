@@ -271,11 +271,11 @@ sum ;Value: 210
 
 ;b)
 (define sine-series
-  (cons-stream 0 (scale-stream
-                  (integrate-series cosine-series)
-                  -1)))
+  (cons-stream 0 (integrate-series cosine-series)))
 (define cosine-series
-  (cons-stream 1 (integrate-series sine-series)))
+  (cons-stream 1 (scale-stream
+                  (integrate-series sine-series)
+                 -1)))
 (display-stream cosine-series 10)
 
 ;ex3.60
@@ -288,3 +288,23 @@ sum ;Value: 210
 (define one (add-streams (mul-series cosine-series cosine-series)
                          (mul-series sine-series sine-series)))
 (display-stream one 10)
+;ex3.61
+(define (reciprocal s)
+  (let ((c (stream-car s))
+        (sr (stream-cdr s)))
+    (cons-stream (/ 1 c)
+                 (mul-series (reciprocal s)
+                             (scale-stream sr (- (/ 1 c)))))))
+;ex3.62
+(define (div-series s1 s2)
+  (mul-series s1 (reciprocal s2)))
+(define tan-series (div-series sine-series cosine-series))
+(define (evaluate series x)
+  (define (evaluate series coeff accum)
+    (let ((new-accum (+ accum (* coeff (stream-car series)))))
+      (cons-stream new-accum
+                   (evaluate (stream-cdr series) (* x coeff) new-accum))))
+  (evaluate series 1 0))
+
+(display-stream (evaluate tan-series 1.) 100)
+(tan 1)
