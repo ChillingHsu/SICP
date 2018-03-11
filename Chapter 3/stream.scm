@@ -226,4 +226,37 @@ sum ;Value: 210
 ; 使用除法定义流，即Fib(n)/Fib(n-1)
 (define ratio (div-stream (stream-cdr s) s))
 
-(display-stream ratio 1000)
+(display-stream ratio 100)
+
+;ex3.58
+(define (expand num den radix)
+  (cons-stream
+    (quotient (* num radix) den)
+    (expand (remainder (* num radix) den) den radix)))
+;求在radix位进位制下分数num/den的各位数位流
+(display-stream (expand 1 7 10) 10)
+; 1
+; 4
+; 2
+; 8
+; 5
+; 7
+; 1
+; 4
+; 2
+; 8
+;Value: done
+; 10进制下1/7 = 0.142857...
+(display-stream (expand 3 8 10) 10)
+; 3
+; 7
+; 5
+; 0
+; 0
+; 0
+; 0
+; 0
+; 0
+; 0
+;Value: done
+; 10进制下3/8 = 0.375000...
