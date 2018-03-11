@@ -132,7 +132,7 @@ sum ;Value: 210
 (define fibs (fibgen 0 1))
 (define (display-stream stream lines)
   (display-line (stream-car stream))
-  (if (= lines 0)
+  (if (= lines 1)
       'done
       (display-stream (stream-cdr stream) (- lines 1))))
 
@@ -197,3 +197,33 @@ sum ;Value: 210
                                 (merge (scale-stream S 3)
                                        (scale-stream S 5)))))
 (display-stream S 10)
+
+;ex3.57
+;如果stream是用来memo-proc的记忆优化，对于斐波那契流来说，计算Fib(n)需要做n-1次加法。
+;Fib(0) = 0
+;Fib(1) = 0
+;Fib(n) = n - 1
+
+;对于没有优化的流来说，计算Fib(n)需要Fib(n-1) + Fib(n-2) + 1次加法，也就是大约为黄金分割为基数的指数函数，即O(1.618^n)
+;如下为验证过程
+; 全1流
+(define ones (cons-stream 1. ones))
+; 定义两个流的除法
+(define (div-stream s1 s2)
+  (stream-map / s1 s2))
+;
+; 定义加法次数流，即
+; Fib(n)需要Fib(n-1) + Fib(n-2) + 1
+; Fib(0) = 0
+; Fib(1) = 0
+(define s (cons-stream 0
+            (cons-stream 0
+                         (add-streams s
+                                      (add-streams (stream-cdr s)
+                                                   ones)))))
+; 为了方便计算，去掉流中前两个为0的项
+(define s (stream-cdr (stream-cdr s)))
+; 使用除法定义流，即Fib(n)/Fib(n-1)
+(define ratio (div-stream (stream-cdr s) s))
+
+(display-stream ratio 1000)
