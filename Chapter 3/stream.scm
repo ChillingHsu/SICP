@@ -260,3 +260,20 @@ sum ;Value: 210
 ; 0
 ;Value: done
 ; 10进制下3/8 = 0.375000...
+
+;ex3.59
+;a)
+(define (integrate-series power-series)
+  (div-stream power-series
+              (integers-starting-from 1.)))
+(define exp-series
+  (cons-stream 1 (integrate-series exp-series)))
+
+;b)
+(define sine-series
+  (cons-stream 0 (scale-stream
+                  (integrate-series cosine-series)
+                  -1)))
+(define cosine-series
+  (cons-stream 1 (integrate-series sine-series)))
+(display-stream cosine-series 10)
