@@ -265,7 +265,7 @@ sum ;Value: 210
 ;a)
 (define (integrate-series power-series)
   (div-stream power-series
-              (integers-starting-from 1.)))
+              (integers-starting-from 1)))
 (define exp-series
   (cons-stream 1 (integrate-series exp-series)))
 
@@ -287,4 +287,4 @@ sum ;Value: 210
                  (mul-series (stream-cdr s1) s2))))
 (define one (add-streams (mul-series cosine-series cosine-series)
                          (mul-series sine-series sine-series)))
-(display-stream (partial-sums one) 10)
+(display-stream one 10)
