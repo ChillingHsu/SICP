@@ -358,3 +358,17 @@ sum ;Value: 210
 (define (sqrt x tolerance)
   (stream-limit (sqrt-stream x) tolerance))
 (sqrt 2 0.000001)
+
+;ex3.65
+(define (ln2 n)
+  (cons-stream (/ 1. n)
+               (stream-map - (ln2 (+ 1 n)))))
+(define alternating-series
+  (cons-stream 1 (stream-map - alternating-series)))
+;another implementation
+(define ln2
+  (mul-stream alternating-series
+              (div-stream ones
+                          integers)))
+(display-stream (accelerated-sequence euler-transform (partial-sums ln2)) 10)
+(log 2)
