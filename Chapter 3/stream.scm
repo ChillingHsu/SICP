@@ -343,3 +343,6 @@ sum ;Value: 210
 (define (accelerated-sequence transform s)
   (stream-map stream-car (make-tableau transform s)))
 (display-stream (accelerated-sequence euler-transform pi-stream) 10)
+
+;ex3.63
+;Louis的实现会让sqrt-stream在每次递归时都重新构造一个新的流，会让时间复杂度由O(n)退化到O(n^2)。而如果没有memo-proc优化，两种实现都会是O(n^2)的复杂度，在效率方面就没有差异了。
