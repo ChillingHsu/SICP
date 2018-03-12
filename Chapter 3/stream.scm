@@ -346,3 +346,15 @@ sum ;Value: 210
 
 ;ex3.63
 ;Louis的实现会让sqrt-stream在每次递归时都重新构造一个新的流，会让时间复杂度由O(n)退化到O(n^2)。而如果没有memo-proc优化，两种实现都会是O(n^2)的复杂度，在效率方面就没有差异了。
+
+;ex3.64
+(define (stream-limit stream tolerance)
+  (if (< (abs (- (stream-car (stream-cdr stream))
+                 (stream-car stream)))
+         tolerance)
+      (stream-car (stream-cdr stream))
+      (stream-limit (stream-cdr stream) tolerance)))
+
+(define (sqrt x tolerance)
+  (stream-limit (sqrt-stream x) tolerance))
+(sqrt 2 0.000001)
