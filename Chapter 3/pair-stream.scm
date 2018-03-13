@@ -38,15 +38,29 @@
 (- (index-of 100 100) 1)
 ;(100 100)之前有1267650600228229401496703205374个序对
 ;Value: 1267650600228229401496703205374
+
+;ex3.67
 (define (pairs s t)
   (cons-stream
     (list (stream-car s) (stream-car t))
     (interleave
-      (stream-map (lambda (x) (list (stream-car s) x))
+      (interleave
+        (stream-map (lambda (x) (list (stream-car s) x))
                   (stream-cdr t))
+        (stream-map (lambda (x) (list (stream-car t) x))
+                  (stream-cdr s)))
       (pairs (stream-cdr s) (stream-cdr t)))))
+;another implementation
+; (define (pairs s t)
+;   (cons-stream
+;     (list (stream-car s) (stream-car t))
+;     (interleave
+;       (stream-map (lambda (x) (list (stream-car s) x))
+;                   (stream-cdr t))
+;       (pairs (stream-cdr s) t))))
+
 (display-stream
   (stream-filter (lambda (pair)
-                   (prime? (+ (car pair) (cadr pair))))
+                   (= (+ (car pair) (cadr pair)) 10))
                  (pairs integers integers))
-  10)
+  100)
