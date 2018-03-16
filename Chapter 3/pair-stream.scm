@@ -86,4 +86,50 @@
                    (= (+ (square (list-ref tri 0))
                          (square (list-ref tri 1)))
                       (square (list-ref tri 2))))
-                 (tripes integers integers integers)) 3)
+                 (tripes integers integers integers)) 1)
+;; ex3.70
+;; a)
+(define (merge-weighted weight s1 s2)
+  (cond ((stream-null? s1) s2)
+        ((stream-null? s2) s2)
+        (else
+         (let ((s1car (stream-car s1))
+               (s2car (stream-car s2)))
+           (let ((s1w (weight s1car))
+                 (s2w (weight s2car)))
+             (cond ((< s1w s2w)
+                    (cons-stream s1car (merge-weighted weight
+                                                       (stream-cdr s1)
+                                                       s2)))
+                   ((> s1w s2w)
+                    (cons-stream s2car (merge-weighted weight
+                                                       s1
+                                                       (stream-cdr s2))))
+                   (else
+                    (cons-stream s1car
+                                 (cons-stream s2car
+                                              (merge-weighted weight
+                                                              (stream-cdr s1)
+                                                              (stream-cdr s2)))))))))))
+(define (pair-weight pair)
+  (+ (car pair) (cadr pair)))
+
+(define (weighted-pairs pair-weight s t)
+  (cons-stream
+   (list (stream-car s) (stream-car t))
+   (merge-weighted pair-weight
+                   (stream-map (lambda (x)
+                                 (list (stream-car s) x))
+                               (stream-cdr t))
+                   (weighted-pairs pair-weight (stream-cdr s)
+                                   (stream-cdr t)))))
+(display-stream (weighted-pairs pair-weight integers integers) 10)
+
+;; b)
+(define (235-pair-weight pair)
+  (let ((i (car pair))
+        (j (cadr pair)))
+    (+ (* 2 i)
+       (* 3 j)
+       (* 5 i j))))
+(display-stream (weighted-pairs 235-pair-weight S S) 10)
