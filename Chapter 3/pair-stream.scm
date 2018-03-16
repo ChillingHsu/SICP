@@ -68,6 +68,7 @@
 ;; ex3.68
 ;; 不能，这样做会导致interleave会不断的调用自己产生无限循环。
 
+;; ex3.69
 (define (tripes s t u)
   (cons-stream
    (list (stream-car s)
@@ -79,9 +80,10 @@
     (tripes (stream-cdr s)
             (stream-cdr t)
             (stream-cdr u)))))
+
 (display-stream (stream-filter
                  (lambda (tri)
                    (= (+ (square (list-ref tri 0))
                          (square (list-ref tri 1)))
                       (square (list-ref tri 2))))
-                 (tripes integers integers integers)) 5)
+                 (tripes integers integers integers)) 3)
