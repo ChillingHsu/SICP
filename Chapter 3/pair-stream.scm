@@ -40,27 +40,48 @@
 ;Value: 1267650600228229401496703205374
 
 ;ex3.67
-(define (pairs s t)
+(define (all-pairs s t)
   (cons-stream
     (list (stream-car s) (stream-car t))
     (interleave
       (interleave
         (stream-map (lambda (x) (list (stream-car s) x))
                   (stream-cdr t))
-        (stream-map (lambda (x) (list (stream-car t) x))
+        (stream-map (lambda (x) (list x (stream-car t)))
                   (stream-cdr s)))
-      (pairs (stream-cdr s) (stream-cdr t)))))
+      (all-pairs (stream-cdr s) (stream-cdr t)))))
 ;another implementation
-; (define (pairs s t)
+; (define (all-pairs s t)
 ;   (cons-stream
 ;     (list (stream-car s) (stream-car t))
 ;     (interleave
 ;       (stream-map (lambda (x) (list (stream-car s) x))
 ;                   (stream-cdr t))
-;       (pairs (stream-cdr s) t))))
+;       (all-pairs (stream-cdr s) t))))
 
 (display-stream
   (stream-filter (lambda (pair)
-                   (= (+ (car pair) (cadr pair)) 10))
+                   (prime? (+ (car pair) (cadr pair))))
                  (pairs integers integers))
-  100)
+  10)
+
+;ex3.68
+;不能，这样做会导致interleave会不断的调用自己产生无限循环。
+
+(define (tripes s t u)
+  (cons-stream
+    (list (stream-car s)
+          (stream-car t)
+          (stream-car u))
+    (interleave
+      (stream-map (lambda (x) (cons (stream-car s) x))
+                  (stream-cdr (pairs t u)))
+      (tripes (stream-cdr s)
+              (stream-cdr t)
+              (stream-cdr u)))))
+(display-stream (stream-filter
+                  (lambda (tri)
+                    (= (+ (square (list-ref tri 0))
+                          (square (list-ref tri 1)))
+                       (square (list-ref tri 2))))
+                  (tripes integers integers integers)) 10)
