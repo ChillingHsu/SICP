@@ -156,7 +156,7 @@
                          (weighted-pairs ramanujan-weight integers integers)
                          false))
 (display-stream (stream-map (lambda (x) (cons (ramanujan-weight x) x))
-                            ramanujan-pairs) 12)
+                            p                           ramanujan-pairs) 12)
 ;; 前六个Ramanujan数是
 ;; 1729
 ;; 4104
@@ -164,3 +164,49 @@
 ;; 20683
 ;; 32832
 ;; 39312
+
+;; ex3.72
+(define (square-weight pair)
+  (let ((i (car pair))
+        (j (cadr pair)))
+    (+ (square i)
+       (square j))))
+
+(define square-pairs (get-repeat-weighted-items
+                      square-weight
+                      (weighted-pairs square-weight integers integers)
+                      false))
+(display-stream (stream-map (lambda (x) (cons (square-weight x) x))
+                            square-pairs) 10)
+(define (get-substream stream weight)
+  (if (null? stream)
+      '()
+      (if (null? (stream-cdr stream))
+          (cons-stream (stream-car stream)
+                       '())
+          (if (= (weight (stream-car stream))
+                 (weight (stream-car (stream-cdr stream))))
+              (cons-stream (stream-car stream)
+                           (get-substream (stream-cdr stream) weight))
+              (cons-stream (stream-car stream)
+                           '())))))
+(define (get-reststream stream weight)
+  (if (= (weight (stream-car stream))
+         (weight (stream-car (stream-cdr stream))))
+      (get-reststream (stream-cdr stream) weight)
+      (stream-cdr stream)))
+
+(define (split-stream stream weight)
+  (cons-stream (stream->list (get-substream stream weight))
+               (split-stream
+                (get-reststream stream weight)
+                weight)))
+(define tripe-square-pairs
+  (stream-filter
+   (lambda (x) (= (length x) 3))
+   (split-stream square-pairs square-weight)))
+(display-stream (stream-map
+                 (lambda (x)
+                   (cons (square-weight (car x))
+                         x))
+                 tripe-square-pairs) 10)
