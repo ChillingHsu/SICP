@@ -133,3 +133,34 @@
        (* 3 j)
        (* 5 i j))))
 (display-stream (weighted-pairs 235-pair-weight S S) 10)
+;; ex3.71
+(define (cube x) (* x x x))
+(define (ramanujan-weight pair)
+  (let ((i (car pair))
+        (j (cadr pair)))
+    (+ (cube i)
+       (cube j))))
+
+(define (get-repeat-weighted-items weight stream prev-item)
+  (if (or (= (weight (stream-car stream))
+             (weight (stream-car (stream-cdr stream))))
+          (if prev-item
+              (= (weight (stream-car stream))
+                 (weight prev-item))
+              false))
+      (cons-stream (stream-car stream)
+                   (get-repeat-weighted-items weight (stream-cdr stream) (stream-car stream)))
+      (get-repeat-weighted-items weight (stream-cdr stream) (stream-car stream))))
+(define ramanujan-pairs (get-repeat-weighted-items
+                         ramanujan-weight
+                         (weighted-pairs ramanujan-weight integers integers)
+                         false))
+(display-stream (stream-map (lambda (x) (cons (ramanujan-weight x) x))
+                            ramanujan-pairs) 12)
+;; 前六个Ramanujan数是
+;; 1729
+;; 4104
+;; 13832
+;; 20683
+;; 32832
+;; 39312
