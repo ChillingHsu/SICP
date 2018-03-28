@@ -41,3 +41,19 @@
                                       avpt))))
 
 (display-stream (make-zero-crossings sense-data 0 0) 10)
+
+;; ex3.76
+(define (smooth input-stream)
+  (define (smooth-iter input-stream last-value)
+    (cons-stream (/ (+ (stream-car input-stream)
+                       last-value)
+                    2)
+                 (smooth-iter (stream-cdr input-stream)
+                              (stream-car input-stream))))
+  (smooth-iter (stream-cdr input-stream) (stream-car input-stream)))
+(define (make-zero-crossings input-stream)
+  (let ((smooth-stream (smooth input-stream)))
+    (stream-map sign-change-detector
+                smooth-stream
+                (cons-stream 0 smooth-stream))))
+(display-stream (make-zero-crossings sense-data) 10)
